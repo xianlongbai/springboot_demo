@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+</head>
+    <body>
+        <h1 th:text="${hello}">Hello, Spring Boot!</h1>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>姓名</th>
+                <th>生日</th>
+                <th>薪资</th>
+            </tr>
+            <tr th:each="user : ${userList}">
+                <td th:text="${user.sort}">0</td>
+                <td th:text="${user.name}">zhansan</td>
+            </tr>
+        </table>
+
+        <select>
+            <option th:each="user:${userList}" th:value="${user.sort}" th:text="${user.name}">我是默认值</option>
+        </select>
+    </body>
+</html>

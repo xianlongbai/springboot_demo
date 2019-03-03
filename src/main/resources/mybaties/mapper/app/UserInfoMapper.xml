@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bxl.dao.UserInfoMapper">
+  <resultMap id="BaseResultMap" type="com.bxl.entity.UserInfo">
+    <constructor>
+      <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="username" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="password" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="role" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="account_non_expired" javaType="java.lang.Boolean" jdbcType="BIT" />
+      <arg column="account_non_locked" javaType="java.lang.Boolean" jdbcType="BIT" />
+      <arg column="credentials_non_expired" javaType="java.lang.Boolean" jdbcType="BIT" />
+      <arg column="enabled" javaType="java.lang.Boolean" jdbcType="BIT" />
+      <arg column="create_time" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="update_time" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, username, password, role, account_non_expired, account_non_locked, credentials_non_expired, 
+    enabled, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from user_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.bxl.entity.UserInfo">
+    insert into user_info (id, username, password, 
+      role, account_non_expired, account_non_locked, 
+      credentials_non_expired, enabled)
+    values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{role,jdbcType=VARCHAR}, #{accountNonExpired,jdbcType=BIT}, #{accountNonLocked,jdbcType=BIT}, 
+      #{credentialsNonExpired,jdbcType=BIT}, #{enabled,jdbcType=BIT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.bxl.entity.UserInfo">
+    insert into user_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="username != null">
+        username,
+      </if>
+      <if test="password != null">
+        password,
+      </if>
+      <if test="role != null">
+        role,
+      </if>
+      <if test="accountNonExpired != null">
+        account_non_expired,
+      </if>
+      <if test="accountNonLocked != null">
+        account_non_locked,
+      </if>
+      <if test="credentialsNonExpired != null">
+        credentials_non_expired,
+      </if>
+      <if test="enabled != null">
+        enabled,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="role != null">
+        #{role,jdbcType=VARCHAR},
+      </if>
+      <if test="accountNonExpired != null">
+        #{accountNonExpired,jdbcType=BIT},
+      </if>
+      <if test="accountNonLocked != null">
+        #{accountNonLocked,jdbcType=BIT},
+      </if>
+      <if test="credentialsNonExpired != null">
+        #{credentialsNonExpired,jdbcType=BIT},
+      </if>
+      <if test="enabled != null">
+        #{enabled,jdbcType=BIT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.bxl.entity.UserInfo">
+    update user_info
+    <set>
+      <if test="username != null">
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="role != null">
+        role = #{role,jdbcType=VARCHAR},
+      </if>
+      <if test="accountNonExpired != null">
+        account_non_expired = #{accountNonExpired,jdbcType=BIT},
+      </if>
+      <if test="accountNonLocked != null">
+        account_non_locked = #{accountNonLocked,jdbcType=BIT},
+      </if>
+      <if test="credentialsNonExpired != null">
+        credentials_non_expired = #{credentialsNonExpired,jdbcType=BIT},
+      </if>
+      <if test="enabled != null">
+        enabled = #{enabled,jdbcType=BIT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.bxl.entity.UserInfo">
+    update user_info
+    set username = #{username,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      role = #{role,jdbcType=VARCHAR},
+      account_non_expired = #{accountNonExpired,jdbcType=BIT},
+      account_non_locked = #{accountNonLocked,jdbcType=BIT},
+      credentials_non_expired = #{credentialsNonExpired,jdbcType=BIT},
+      enabled = #{enabled,jdbcType=BIT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="findUserInfoByUserName" parameterType="java.lang.String" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Column_List"/> FROM user_info WHERE username = #{username}
+  </select>
+
+</mapper>

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="com.bxl.dao.UserDao">
+    <!--
+    id, 唯一性，注意啦，这个id用于标示这个javabean对象的唯一性， 不一定会是数据库的主键（不要把它理解为数据库对应表的主键）
+    property属性对应javabean的属性名，column对应数据库表的列名（这样，当javabean的属性与数据库对应表的列名不一致的时候，
+    就能通过指定这个保持正常映射了）
+    -->
+    <resultMap id="BaseResultMap" type="user" >
+        <id column="id" property="id" />
+        <!-- result与id相比， 对应普通属性 -->
+        <result column="name" property="name" />
+        <result column="password" property="password" />
+        <!--指定了jdbcType、javaType后会默认使用typeHandler-->
+        <result column="age" property="age" />
+        <result column="delete_flag" property="deleteFlag" />
+
+
+            <!-- idArg 对应构造方法中的id参数 -->
+            <!-- arg 对应构造方法中的普通参数 -->
+        <!--<constructor>
+            <idArg column=""/>
+            <arg column=""/>
+        </constructor>-->
+
+        <!--
+            collection，对应javabean中容器类型, 是实现一对多的关键
+            property 为javabean中容器对应字段名
+            column 为体现在数据库中列名
+            ofType 就是指定javabean中容器指定的类型
+        -->
+        <!--<collection property="" column="" ofType=""></collection>-->
+
+        <!--
+            association 为关联关系，是实现N对一的关键。
+            property 为javabean中容器对应字段名
+            column 为体现在数据库中列名
+            javaType 指定关联的类型
+         -->
+        <!--<association property="" column="" javaType=""></association>-->
+    </resultMap>
+
+    <!--指定参数映射-->
+    <parameterMap id="BaseParamMap" type="user">
+        <parameter property="name" resultMap="BaseResultMap" />
+        <parameter property="password" resultMap="BaseResultMap" />
+        <parameter property="age" resultMap="BaseResultMap" jdbcType="VARCHAR" javaType="int"/>
+        <parameter property="deleteFlag" resultMap="BaseResultMap" />
+    </parameterMap>
+
+
+    <select id="findUserById" resultMap="BaseResultMap">
+        select * from user where id = #{id}
+    </select>
+
+    <insert id="saveUser" parameterMap="BaseParamMap">
+        INSERT INTO user(`name`,`password`,`age`,`delete_flag`) VALUES
+        (#{name},#{password},#{age},#{deleteFlag})
+    </insert>
+
+    <insert id="saveUserToMap" parameterMap="BaseParamMap">
+        INSERT INTO user(`name`,`password`,`age`,`delete_flag`) VALUES
+        (#{name},#{password},#{age},#{deleteFlag})
+    </insert>
+
+<!--=========================================一对多的配置===============================================================-->
+
+
+    <resultMap type="student" id="stuMap">
+        <id property="idCard" column="stu_id_card"/>
+        <result property="id" column="stu_id"/>
+        <result property="name" column="stu_name"/>
+        <result property="deleteFlag" column="stu_delete_flg"/>
+    </resultMap>
+
+
+
+    <!-- 这儿定义一个resultMap 一对多-->
+    <resultMap type="student" id="studentMap" extends="stuMap">
+
+        <!--
+            数据库中主键是id, 但是我这儿却是指定idCard为主键，为什么？
+            刚刚讲了，id用来表示唯一性， 我们可以认为只要idCard一样，那么他就是同一个学生。
+            如果此处用数据库中id， 那么mybatis将会认为数据库中每条记录都是一个student, 这显然不符合逻辑
+        -->
+       <!-- <id property="idCard" column="stu_id_card"/>
+        <result property="id" column="stu_id"/>
+        <result property="name" column="stu_name"/>
+        <result property="deleteFlag" column="stu_delete_flg"/>-->
+
+        <!--
+            这儿就是实现一对多的关键。
+            在Student中，courseList为List<Course>, 因此，ofType也应该与之对应（当然，我用了别名，不然要蛋疼的写全名了）。
+            collection的子标签是在指定Course的映射关系（由于Course的javabean的属性名与数据库的列名不一致）
+        -->
+        <collection property="courseList" column="stu_course_id" ofType="course">
+            <id property="id" column="course_id"/>
+            <result property="name" column="course_name"/>
+            <result property="deleteFlag" column="course_delete_flg"/>
+        </collection>
+    </resultMap>
+
+    <!-- 这儿将返回类型设置成了上面指定的studentMap -->
+    <select id="findStudentById" resultMap="studentMap">
+        SELECT s.*, c.* FROM t_student s LEFT JOIN t_course c ON s.stu_course_id=c.course_id WHERE s.stu_id_card=#{idCard}
+    </select>
+
+
+    <!--========================================多对一的配置===============================================================-->
+
+    <!-- 这儿定义一个resultMap 多对一  -->
+    <resultMap type="course" id="courseMap">
+        <id property="id" column="course_id"/>
+        <result property="name" column="course_name"/>
+        <result property="deleteFlag" column="course_delete_flg"/>
+        <!--
+            association 为关联关系，是实现N对一的关键。
+            property 为javabean中容器对应字段名
+            column 为体现在数据库中列名
+            javaType 指定关联的类型
+            select 	使用另一个查询封装的结果
+        -->
+        <association property="student" column="course_stu_id" javaType="student" >
+            <!--这表示每一个id对应的一条数据为一个学生-->
+            <id property="id" column="stu_id"/>
+            <result property="idCard" column="stu_id_card"/>
+            <result property="name" column="stu_name"/>
+            <result property="cid" column="stu_course_id"/>
+            <result property="deleteFlag" column="stu_delete_flg"/>
+        </association>
+    </resultMap>
+
+
+    <!-- 这儿将返回类型设置成了上面指定的studentMap  多对一-->
+    <select id="findCourseByCid" resultMap="courseMap">
+        SELECT s.*, c.* FROM t_student s JOIN t_course c ON s.stu_id=c.course_stu_id WHERE c.course_id=#{id}
+    </select>
+
+
+    <!--========================================多对多的配置===============================================================-->
+    <resultMap type="book" id="bookMap">
+        <id property="bid" column="bid"/>
+        <result property="bname" column="bname"/>
+    </resultMap>
+
+    <resultMap type="book" id="bookdetailMap" extends="bookMap">
+        <collection property="categories"  ofType="ctegory">
+            <id property="cid" column="cid"/>
+            <result property="cname" column="cname"/>
+        </collection>
+    </resultMap>
+
+    <resultMap type="ctegory" id="ctegoryMap">
+        <id property="cid" column="cid"/>
+        <result property="cname" column="cname"/>
+    </resultMap>
+
+    <resultMap type="ctegory" id="ctegorydetailMap" extends="ctegoryMap">
+        <collection property="books"  ofType="book">
+            <id property="bid" column="bid"/>
+            <result property="bname" column="bname"/>
+        </collection>
+    </resultMap>
+
+    <select id="queryAll" resultMap="bookdetailMap">
+        select * from book b
+        inner join middle m
+        on b.bid=m.m_bid
+        inner join category c
+        on m.m_cid=c.cid
+    </select>
+
+    <select id="findCtegoryByCid" parameterType="java.lang.Integer" resultMap="ctegorydetailMap">
+      SELECT * FROM category c JOIN middle m ON c.cid = m.m_cid JOIN book b ON m.m_bid = b.bid
+      WHERE c.cid = #{cid}
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

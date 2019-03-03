@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<!--1. configuration节点为根节点。
+2. 在configuration节点之下，我们可以配置10个子节点， 分别为：properties、typeAliases、plugins、objectFactory、
+objectWrapperFactory、settings、environments、databaseIdProvider、typeHandlers、mappers。-->
+<configuration>
+    <!--==================================================================================================-->
+    <!--通过package, 可以直接指定package的名字， mybatis会自动扫描你指定包下面的javabean,
+    并且默认设置一个别名，默认的名字为： javabean 的首字母小写的非限定类名来作为它的别名。
+    也可在javabean 加上注解@Alias 来自定义别名， 例如： @Alias(user)
+    <package name="com.dy.entity"/>-->
+    <typeAliases>
+        <!--方式一,alias可以为null，默认的别名为类名首字母小写-->
+        <typeAlias alias="user" type="com.bxl.entity.User"/>
+        <typeAlias alias="student" type="com.bxl.entity.Student"/>
+        <typeAlias alias="course" type="com.bxl.entity.Course"/>
+
+        <typeAlias alias="book" type="com.bxl.entity.Book"/>
+        <typeAlias alias="ctegory" type="com.bxl.entity.Category"/>
+        <typeAlias alias="middle" type="com.bxl.entity.Middle"/>
+        <!--方式二,这里指定要扫描的包,在实体类上使用@Alias("user")来自定义别名，当眼可以不指定，默认的别名为类名首字母小写-->
+        <!--<package name="com.bxl.entity"/>-->
+    </typeAliases>
+    <!--==================================================================================================-->
+
+    <!--
+        当配置package的时候，mybatis会去配置的package扫描TypeHandler
+        实现 org.apache.ibatis.type.TypeHandler 接口， 或继承一个很便利的类 org.apache.ibatis.type.BaseTypeHandler，
+        然后可以选择性地将它映射到一个 JDBC 类型
+        <package name="com.dy.demo"/>
+     -->
+    <!-- handler属性直接配置我们要指定的TypeHandler -->
+    <!--<typeHandler handler=""/>-->
+
+    <!-- javaType 配置java类型，例如String, 如果配上javaType, 那么指定的typeHandler就只作用于指定的类型 -->
+    <!--<typeHandler javaType="" handler=""/>-->
+
+    <!-- jdbcType 配置数据库基本数据类型，例如varchar, 如果配上jdbcType, 那么指定的typeHandler就只作用于指定的类型  -->
+    <!--<typeHandler jdbcType="" handler=""/>-->
+
+    <!-- 也可两者都配置 -->
+    <!--<typeHandler javaType="" jdbcType="" handler=""/>-->
+
+    <!-- 由于自定义的TypeHandler在定义时已经通过注解指定了jdbcType, 所以此处不用再配置jdbcType -->
+    <typeHandlers>
+        <typeHandler handler="com.bxl.handler.mybatishandler.ExampleTypeHandler"/>
+    </typeHandlers>
+
+    <!--todo==================================================================================================-->
+    <!--objectFactory： MyBatis每次创建结果对象的新实例时，它都会使用一个对象工厂（ObjectFactory）实例来完成。
+        默认的对象工厂需要做的仅仅是实例化目标类，要么通过默认构造方法，要么在参数映射存在的时候通过参数构造方法来实例化。
+        默认情况下，我们不需要配置，mybatis会调用默认实现的objectFactory。 除非我们要自定义ObjectFactory的实现，
+        那么我们才需要去手动配置。 自定义ObjectFactory只需要去继承DefaultObjectFactory（是ObjectFactory接口的实现类），并重写其方法即可。-->
+    <objectFactory type="com.bxl.factory.mybatisfactory.ExampleObjectFactory">
+        <property name="someProperty" value="100"/>
+    </objectFactory>
+
+    <!--todo==================================================================================================-->
+    <!--plugins 是一个可选配置。mybatis中的plugin其实就是个interceptor， 它可以拦截Executor 、ParameterHandler 、
+    ResultSetHandler 、StatementHandler 的部分方法，处理我们自己的逻辑。Executor就是真正执行sql语句的东西，
+    ParameterHandler 是处理我们传入参数的，还记得前面讲TypeHandler的时候提到过，mybatis默认帮我们实现了不少的typeHandler,
+    当我们不显示配置typeHandler的时候，mybatis会根据参数类型自动选择合适的typeHandler执行，其实就是ParameterHandler
+    在选择。ResultSetHandler 就是处理返回结果的。-->
+    <plugins>
+        <!--自定义插件-->
+        <plugin interceptor="com.bxl.plugins.mybatisplugins.ExamplePlugin">
+            <property name="someProperty" value="100"/>
+            <property name="param2" value="value2"/>
+        </plugin>
+
+        <!-- com.github.pagehelper为PageHelper类所在包名 -->
+            <!-- 设置数据库类型Oracle,Mysql,MariaDB,SQLite,Hsqldb,PostgreSQL六种数据库 -->
+        <!--<plugin interceptor="com.github.pagehelper.PageHelper">
+            <property name="dialect" value="mysql"/>
+        </plugin>-->
+
+    </plugins>
+
+
+    <!--==================================================================================================-->
+
+    <!-- 1、指定properties配置文件， 我这里面配置的是数据库相关 -->
+    <!--<properties resource="dbConfig.properties"></properties>-->
+
+    <!-- 指定Mybatis使用log4j -->
+    <!--<settings>
+        <setting name="logImpl" value="LOG4J"/>
+    </settings>-->
+
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <!--2、如果上面没有指定数据库配置的properties文件，那么此处可以这样直接配置-->
+              <property name="driver" value="com.mysql.jdbc.Driver"/>
+              <property name="url" value="jdbc:mysql://localhost:3306/test"/>
+              <property name="username" value="root"/>
+              <property name="password" value="root"/>
+
+                <!-- 上面指定了数据库配置文件， 配置文件里面也是对应的这四个属性 -->
+                <!--<property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>-->
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!--==================================================================================================-->
+
+
+
+    <!--==================================================================================================-->
+
+
+
+
+    <!--==================================================================================================-->
+    <!-- 映射文件，mybatis精髓， 后面才会细讲 -->
+    <!--配置我们的mapper映射文件， 所谓的mapper映射文件，就是让mybatis 用来建立数据表和javabean映射的一个桥梁。
+    在我们实际开发中，通常一个mapper文件对应一个dao接口， 这个mapper可以看做是dao的实现。所以,mappers必须配置。-->
+    <mappers>
+        <!-- 第一种方式：通过resource指定 -->
+        <mapper resource="mybaties/mapper/userDao-mapping.xml"/>
+
+        <!-- 第二种方式， 通过class指定接口，进而将接口与对应的xml文件形成映射关系
+            不过，使用这种方式必须保证 接口与mapper文件同名(不区分大小写)，
+            我这儿接口是UserDao,那么意味着mapper文件为UserDao.xml
+            <mapper class="com.dy.dao.UserDao"/>
+          -->
+        <!-- 第三种方式，直接指定包，自动扫描，与方法二同理
+            <package name="com.dy.dao"/>
+          -->
+        <!-- 第四种方式：通过url指定mapper文件位置
+            <mapper url="file://........"/>
+          -->
+    </mappers>
+
+
+
+</configuration>
