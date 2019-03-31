@@ -34,4 +34,6 @@
 ### 总结
 * 1、自定义各种处理器，如登录成功、登录失败、登出成功、统一异常结果处理等等
 * 2、继承OncePerRequestFilter抽象类，实现自己的业务逻辑
-
+## 其它
+![](https://github.com/xianlongbai/springboot_demo/blob/master/src/main/resources/s001.png)
+![](https://github.com/xianlongbai/springboot_demo/blob/master/src/main/resources/s002.png)
